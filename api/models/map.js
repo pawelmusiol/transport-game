@@ -1,9 +1,7 @@
-const mongoose = require('mongoose');
 const mapSchema = require('../schemas/map');
+const db = require('../utils/db')
 
-const mongoDB = "mongodb+srv://admin:123321@cluster0.wddka.mongodb.net/Cluster0?retryWrites=true&w=majority"
-mongoose.connect(mongoDB, {useNewUrlParser: true, useUnifiedTopology: true})
-
+db.connect()
 exports.getMap = async  () => {
         let data = await mapSchema.find({})
         return data[0]

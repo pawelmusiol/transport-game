@@ -1,20 +1,36 @@
 import { Layer } from "react-konva"
+import { WaitLayer } from "."
 import { Tile } from "."
 import { memo } from "react"
 
-const TileLayer = ({tiles, setCurrentTile}) => {
-    const onMouseEnter = (tile) => {
-        setCurrentTile({
-            type: tile.t,
-            crossable: tile.c,
-        })
-    }
-    let TileArray = tiles.map(tile => <Tile X={tile.x} Y={tile.y} type={tile.t} onMouseEnter={() => onMouseEnter(tile)}/>)
+const TileLayer = ({ tiles, onMouseEnter, tileSize }) => {
+
+    return (
+        <>
+            {tiles.length ?
+                <MemoLayer tiles={tiles} onMouseEnter={onMouseEnter} tileSize={tileSize} />
+                :
+                <WaitLayer />
+            }
+        </>
+    )
+}
+
+const layerToMemo = ({ tiles, onMouseEnter, tileSize }) => {
+    let TileArray = tiles.map(tile => <Tile x={tile.x} y={tile.y} type={tile.t} onMouseEnter={() => onMouseEnter(tile)} size={tileSize} />)
     return (
         <Layer>
             {TileArray}
         </Layer>
     )
 }
+const MemoLayer = memo(layerToMemo,(prevProps, nextProps) => {
+    if (prevProps.tiles === nextProps.tiles) {
+        return true
+    }
+    else{
+        return false
+    }
+})
 
-export default memo(TileLayer)
+export default TileLayer

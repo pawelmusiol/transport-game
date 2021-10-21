@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
-const chunkSchema = require('./chunk')
+const provinceSchema = require('./province')
 const mapSchema = new mongoose.Schema({
-	chunks:[[chunkSchema.chunkSchema]]
+	chunks:[[provinceSchema.chunkMapSchema]]
 })
 
 

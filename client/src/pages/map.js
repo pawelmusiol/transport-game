@@ -1,10 +1,9 @@
-import { Canvas } from "../components"
+import { WorldCanvas } from "../components"
 
 const Map = () => {
     
-
     return (
-        <Canvas />
+        <WorldCanvas />
     )
 }
 

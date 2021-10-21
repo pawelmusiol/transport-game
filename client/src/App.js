@@ -1,19 +1,23 @@
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom"
-import { Map } from "./pages"
+import { Switch, Route, Link, useHistory } from "react-router-dom"
+
+import { Map, Province } from "./pages"
 
 function App() {
+  const history = useHistory()
   return (
-      <Router>
-        <Switch>
-          <Route exact path="/">
-            <p>dupa</p>
-          </Route>
-          <Route path="/map">
-            <p>kek</p>
-            <Map />
-          </Route>
-        </Switch>
-      </Router>
+
+    <Switch>
+      <Route exact path="/">
+        <Link to="/map" >dupa</Link>
+      </Route>
+      <Route exact path="/map">
+        <Map />
+      </Route>
+      <Route path="/map/province/:chunkId">
+        <button onClick={() => history.goBack()}>Wróć</button>
+        <Province />
+      </Route>
+    </Switch>
   );
 }
 
