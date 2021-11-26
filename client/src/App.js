@@ -14,7 +14,7 @@ function App() {
         <Map />
       </Route>
       <Route path="/map/province/:chunkId">
-        <button onClick={() => history.goBack()}>Wróć</button>
+        {/*<button onClick={() => history.goBack()}>Wróć</button>*/}
         <Province />
       </Route>
     </Switch>

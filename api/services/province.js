@@ -1,13 +1,12 @@
 const provinceModel = require('../models/province')
+const building = require("./building")
 
 exports.setProvinces = async () => {
-
     return await createProvinces()
 }
 
 exports.getProvince = async (id) => {
     if (checkId) {
-        console.log(getIds(id))
         return await provinceModel.getProvince(id)
     }
 }
@@ -15,8 +14,35 @@ exports.getProvince = async (id) => {
 exports.getProvinces = async (id) => {
     if (checkId) {
         let ids = getIds(id)
-        return await provinceModel.getProvinces(ids)
+        let result = await provinceModel.getProvinces(ids)
+        let minMax = getMinMax(result.provinces)
+        let buildings = await building.getBuildingsInRange(minMax)
+        console.log(buildings)
+        result.buildings = buildings
+        return result
     }
+}
+
+const getMinMax = (provinces) => {
+    let min = { x: 159, y: 159 }
+    let max = { x: 0, y: 0 }
+
+    provinces.forEach(province => {
+        if (province.position.x < min.x) {
+            min.x = province.position.x
+        }
+        if (province.position.y < min.y) {
+            min.y = province.position.y
+        }
+        if (province.position.x > max.x) {
+            max.x = province.position.x
+        }
+        if (province.position.y > min.y) {
+            max.y = province.position.y
+        }
+    })
+    return { min: min, max: max }
+
 }
 
 const getIds = (id) => {

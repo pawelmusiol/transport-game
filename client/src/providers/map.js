@@ -1,6 +1,6 @@
 import { createContext } from "react"
 
-export const mapThemes = {
+export const MapThemes = {
     small: {
         world: {
             width: 10,
@@ -13,6 +13,15 @@ export const mapThemes = {
     }
 }
 
-const MapThemeContext = createContext(mapThemes)
+export const MapEventListeners = {
+    top: {
+        buildings: true
+    },
+    terrain: {
+        buildings: false
+    },
 
-export default MapThemeContext
+}
+
+export const MapEventListenersContext = createContext(MapEventListeners.top)
+export const MapThemeContext = createContext(MapThemes)

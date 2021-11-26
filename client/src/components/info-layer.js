@@ -1,12 +1,15 @@
 import { Layer } from "react-konva"
 import { TileInfo } from "."
-const InfoLayer = ({ mousePos, CurrentTile }) => {
+
+//Return Layer with popup with information about tile
+const InfoLayer = ({ mousePos, CurrentTile, buildings }) => {
+
     return (
         <Layer>
             <TileInfo
+                buildings={buildings}
                 mousePos={mousePos}
-                type={CurrentTile.type}
-                crossable={CurrentTile.crossable}
+                tile={CurrentTile}
             />
         </Layer>
     )

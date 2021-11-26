@@ -1,15 +1,18 @@
 import { Rect } from "react-konva"
-import { useHistory } from "react-router-dom"
 
-const Tile = ({ x, y, type, onMouseEnter, size }) => {
-
+//render one tile
+const Tile = ({ x, y, type, onMouseOver, size, color, onClick, listening }) => {
+    const fillColor = () => color ? color : `#${Math.floor(Math.random() * 9)}44`
     return (
-        <Rect onMouseOver={onMouseEnter}
-        width={size}
-        height={size}
-        x={x}
-        y={y}
-        fill={`#${/*type*3*/ Math.floor(Math.random()*9)}44`}
+        <Rect
+            listening={listening}
+            onClick={onClick}
+            onMouseOver={onMouseOver}
+            width={size}
+            height={size}
+            x={x}
+            y={y}
+            fill={fillColor()}
         />
     )
 }

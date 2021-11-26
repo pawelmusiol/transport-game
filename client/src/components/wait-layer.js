@@ -1,5 +1,8 @@
 import { Layer } from "react-konva"
 import { Html } from "react-konva-utils"
+
+
+//render layer for loading data
 const WaitLayer = () => {
     return (
         <Layer>

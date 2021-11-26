@@ -3,12 +3,17 @@ import { WaitLayer } from "."
 import { Tile } from "."
 import { memo } from "react"
 
-const TileLayer = ({ tiles, onMouseEnter, tileSize }) => {
-
+//render memorized layer
+const TileLayer = ({ tiles, onMouseOver, tileSize, onClick }) => {
     return (
         <>
             {tiles.length ?
-                <MemoLayer tiles={tiles} onMouseEnter={onMouseEnter} tileSize={tileSize} />
+                <MemoLayer
+                    tiles={tiles}
+                    onMouseOver={onMouseOver}
+                    tileSize={tileSize}
+                    onClick={onClick}
+                />
                 :
                 <WaitLayer />
             }
@@ -16,19 +21,32 @@ const TileLayer = ({ tiles, onMouseEnter, tileSize }) => {
     )
 }
 
-const layerToMemo = ({ tiles, onMouseEnter, tileSize }) => {
-    let TileArray = tiles.map(tile => <Tile x={tile.x} y={tile.y} type={tile.t} onMouseEnter={() => onMouseEnter(tile)} size={tileSize} />)
+//memorize TileLayer for better optimalization
+const LayerToMemo = ({ tiles, onMouseOver, tileSize, onClick }) => {
+
+
+    let TileArray = tiles.map(tile =>
+        <Tile
+            name={tile.name}
+            x={tile.x}
+            y={tile.y}
+            type={tile.t}
+            onMouseOver={e => onMouseOver(e, tile)}
+            size={tileSize}
+        />)
+
     return (
-        <Layer>
+        <Layer onClick={onClick}>
             {TileArray}
         </Layer>
     )
 }
-const MemoLayer = memo(layerToMemo,(prevProps, nextProps) => {
+const MemoLayer = memo(LayerToMemo, (prevProps, nextProps) => {
+    
     if (prevProps.tiles === nextProps.tiles) {
         return true
     }
-    else{
+    else {
         return false
     }
 })

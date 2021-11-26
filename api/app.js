@@ -19,6 +19,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cors())
 app.use('/', indexRouter);
 app.use('/map/',require('./routes/map'));
+app.use('/building/',require('./routes/building'));
+app.use('/route/',require('./routes/route'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -2,44 +2,57 @@ import { useState, useEffect, Suspense, lazy } from "react"
 import { useCurrentTile, usePosition } from "../hooks"
 import { Stage } from "react-konva"
 import { WaitLayer, InfoLayer } from "."
-import { useLocation } from "react-router-dom"
+import { useParams } from "react-router-dom"
+import { useDispatch, useSelector } from 'react-redux'
 import axios from 'axios'
 const TileLayer = lazy(() => import("./tile-layer"))
+const BuildingLayer = lazy(() => import("./building-layer"))
 
 const useMap = (id) => {
-    const [Tiles, setTiles] = useState({})
+    const [Fetched, setFetched] = useState(false)
+    const dispatch = useDispatch()
     let [x, y] = id.split('.')
     useEffect(() => {
         axios.get(`http://localhost:8000/map/provinces/${id}`).then(res => {
-            setTiles(setMap(res.data.provinces, x, y))
+            dispatch({ type: "GET_TILES", Tiles: setMap(res.data.provinces, x, y) })
+            dispatch({ type: "GET_BUILDINGS", Buildings: setBuildingsToMap(res.data.buildings, x, y) })
+            setFetched(true)
         })
     }, [])
-    return [Tiles]
+    return Fetched
+}
+
+export const setBuildingsToMap = (buildings, x, y) => {
+    let buildingsToRender = []
+    buildings.forEach(building => {
+        buildingsToRender.push({
+            t: building.t,
+            x: building.position.tile.x * 20 + (building.position.province.x - x + 1) * 16 * 20,
+            y: building.position.tile.y * 20 + (building.position.province.y - y + 1) * 16 * 20,
+        })
+    })
+    return buildingsToRender
 }
 
 /**
  * 
- * @param {[
- * {position:{x:Number, y:Number}, 
- * "id":String, 
- * tiles:[[
- * position:{x:Number, y:Number}, 
- * t: Number,
- * c: Boolean,
- * ]]
- * }]
- * } province 
+ * @param {React.WheelEvent} e 
  */
+const zoomMap = e => {
+    console.log(e)
+}
 
 /**
- * 
  * @param {{
  * position:{x:Number, y:Number}, 
  * t: Number,
  * c: Boolean,
  * }[][]} tiles 
+ * @param {{x:Number, y:Number}} provincePosition
  */
 
+
+//return list of tiles to render with position and type from one province
 const setFromTiles = (tiles, provincePosition) => {
     let tilesToRender = []
     tiles.forEach(tilesRow => {
@@ -54,29 +67,43 @@ const setFromTiles = (tiles, provincePosition) => {
     })
     return tilesToRender
 }
+//return list of tiles from list of provinces
 const setMap = (provinces, x, y) => {
-    console.log(provinces)
     let result = []
     provinces.forEach(province => {
         let positions = { x: province.position.x - x + 1, y: province.position.y - y + 1 }
-        console.log(positions)
         result.push(...setFromTiles(province.tiles, positions))
     })
     return result
-
 }
 
-const ProvinceCanvas = () => {
-    const location = useLocation()
-    const [CurrentTile, onMouseEnter] = useCurrentTile()
+
+
+const ProvinceCanvas = ({ BuildingInHand, setPositionToBuild }) => {
+    const { chunkId } = useParams()
+    const Fetched = useMap(chunkId)
+    const Tiles = useSelector(state => state.Tiles)
+    const Buildings = useSelector(state => state.Buildings)
+    const [CurrentTile, onMouseOver] = useCurrentTile(Buildings)
     const [Position, getPosition] = usePosition()
-    const [Tiles] = useMap(location.pathname.split('/')[location.pathname.split('/').length - 1])
+
     return (
         <Stage width={16 * 3 * 20} height={16 * 3 * 20} onMouseOver={getPosition}>
-            <Suspense fallback={<WaitLayer />}>
-                <TileLayer onMouseEnter={onMouseEnter} tiles={Tiles} tileSize={20} />
-            </Suspense>
-            <InfoLayer mousePos={Position} CurrentTile={CurrentTile} />
+            {Fetched ?
+                <>
+                    <Suspense fallback={<WaitLayer />}>
+                        <TileLayer
+                            onMouseOver={onMouseOver}
+                            tiles={Tiles}
+                            tileSize={20}
+                            onClick={e => setPositionToBuild(e.target.attrs)}
+                        />
+                        <BuildingLayer fetched={Fetched} onMouseOver={onMouseOver} buildings={Buildings} tileSize={20} />
+                    </Suspense>
+                    <InfoLayer mousePos={Position} CurrentTile={CurrentTile} Building={BuildingInHand} buildings={Buildings} />
+                </>
+                : <WaitLayer />
+            }
         </Stage>
     )
 }

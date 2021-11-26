@@ -16,12 +16,12 @@ const useMap = () => {
     return [Tiles]
 }
 /**
- * 
+ * setting map from chunks
  * @param {[{position:{x:Number,y:Number}, tiles:[[{t:Number,c:Boolean,id:String}]]}]} chunks 
  */
 const setMap = (chunks) => {
     let tiles = []
-    chunks.map((chunk) => {
+    chunks.forEach((chunk) => {
         for (let i = 0; i < chunk.tiles.length; i++) {
             let row = []
             for (let j = 0; j < chunk.tiles[i].length; j++) {
@@ -39,6 +39,7 @@ const setMap = (chunks) => {
     return tiles
 }
 
+//Check if position is in borders minus one to see 3x3 provinces
 const checkPosition = (position) => {
     let finalPosition = position
     if (position.x <= 0) {
@@ -56,26 +57,30 @@ const checkPosition = (position) => {
     return finalPosition
 }
 
-const WorldCanvas = () => {
+const useMapClick = (position) => {
     const history = useHistory()
-    const [CurrentTile, onMouseEnter] = useCurrentTile()
-    const [Position, getPosition ] = usePosition()
-
-    const [Tiles] = useMap()
-
-    const onClick = () => {
-        console.log(CurrentTile.position)
-        let position = checkPosition(CurrentTile.position)
-        console.log(position)
+    const goToProvince = () => {
+        position = checkPosition(position)
         history.push(`/map/province/${position.x}.${position.y}`)
     }
+    return goToProvince
+}
+
+const WorldCanvas = () => {
+    
+    const [CurrentTile, onMouseOver] = useCurrentTile()
+    const [Position, getPosition ] = usePosition()
+    const goToProvince = useMapClick(CurrentTile.position)
+    const [Tiles] = useMap()
+
+    
 
     return (
         <>
             <p>sztos </p>
-            <Stage width={1600} height={1200} onMouseOver={getPosition} onClick={onClick}>
+            <Stage width={1600} height={1200} onMouseOver={getPosition} onClick={goToProvince}>
                 <Suspense fallback={<WaitLayer />}>
-                    <TileLayer onMouseEnter={onMouseEnter} tiles={Tiles} tileSize={10}/>
+                    <TileLayer onMouseOver={onMouseOver} tiles={Tiles} tileSize={10}/>
                 </Suspense>
                 <InfoLayer mousePos={Position} CurrentTile={CurrentTile} />
             </Stage>
